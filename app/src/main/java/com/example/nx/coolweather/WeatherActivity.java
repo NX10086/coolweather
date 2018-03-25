@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -62,6 +63,8 @@ public class WeatherActivity extends AppCompatActivity{
         String weatherString =preferences.getString("weather",null);
         if (weatherString!=null){
             Weather weather = Utility.handleWeatherResponse(weatherString);
+            Log.i("TAG","weatherString"+" "+weatherString.toString());
+            Log.i("TAG",weather.toString());
             showWeatherInfo(weather);
         }else {
             String weatherId = getIntent().getStringExtra("weather_id");
@@ -70,7 +73,7 @@ public class WeatherActivity extends AppCompatActivity{
         }
     }
     public void requestWeather (final  String weatherid){
-        String weatherUrl = "http://guolin.tech/api/weather?cityid="+weatherid +"0d935cf1fa5645e6944a064497bbfe4a";
+        String weatherUrl = "http://guolin.tech/api/weather?cityid=" +weatherid  +"&key=0d935cf1fa5645e6944a064497bbfe4a";
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -86,6 +89,7 @@ public class WeatherActivity extends AppCompatActivity{
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 final String responseTest = response.body().string();
+                Log.i("TAG",123+responseTest.toString());
                 final Weather weather =Utility.handleWeatherResponse(responseTest);
                 runOnUiThread(new Runnable() {
                     @Override
@@ -106,6 +110,7 @@ public class WeatherActivity extends AppCompatActivity{
     }
     private  void showWeatherInfo(Weather weather){
         String cityName = weather .basic.cityName;
+        Log.i("TAG","weather city name "+weather.basic.cityName);
         String updateTime = weather.basic.update.updateTime.split(" ")[1];
         String degree = weather.now.temperature+"℃";
         String weatherInfo =weather.now.more.info;
@@ -114,12 +119,18 @@ public class WeatherActivity extends AppCompatActivity{
         degreeText.setText(degree);
         weatherInfoText.setText(weatherInfo);
         forecastLayout.removeAllViews();
+        Log.i("TAG",789+weather.forecastList.toString());
         for(Forecast forecast : weather.forecastList){
             View view = LayoutInflater.from(this).inflate(R.layout.forecast_item,forecastLayout,false);
-            TextView dateText = (TextView)findViewById(R.id.date_text);
-            TextView infoText = (TextView)findViewById(R.id.info_text);
-            TextView maxText = (TextView)findViewById(R.id.max_text);
-            TextView minText = (TextView)findViewById(R.id.min_text);
+            TextView dateText = (TextView)view.findViewById(R.id.date_text);
+            TextView infoText = (TextView)view.findViewById(R.id.info_text);
+            TextView maxText = (TextView)view.findViewById(R.id.max_text);
+            TextView minText = (TextView)view.findViewById(R.id.min_text);
+            Log.i("TAG","date"+forecast.date);
+            Log.i("TAG","info"+forecast.more.info);
+            Log.i("TAG","max"+forecast.temperature.max);
+            Log.i("TAG","min"+forecast.temperature.min);
+
             dateText.setText(forecast.date);
             infoText.setText(forecast.more.info);
             maxText.setText(forecast.temperature.max);
@@ -127,8 +138,8 @@ public class WeatherActivity extends AppCompatActivity{
             forecastLayout.addView(view);
         }
         if(weather.aqi !=null){
-            aqiText.setText(weather.aqi.aqiCity.aqi);
-            pm25Text.setText(weather.aqi.aqiCity.pm25);
+            aqiText.setText(weather.aqi.city.aqi);
+            pm25Text.setText(weather.aqi.city.pm25);
         }
         String comfort = "舒适度:"+weather.suggestion.comfort.info;
         String carWash = "洗车指数"+weather.suggestion.carWash.info;
