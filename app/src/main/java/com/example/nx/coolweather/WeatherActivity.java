@@ -1,5 +1,6 @@
 package com.example.nx.coolweather;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.nx.coolweather.gson.Forecast;
 import com.example.nx.coolweather.gson.Weather;
+import com.example.nx.coolweather.service.AutoUpdateService;
 import com.example.nx.coolweather.util.HttpUtil;
 import com.example.nx.coolweather.util.Utility;
 
@@ -221,5 +223,7 @@ public class WeatherActivity extends AppCompatActivity{
         carWashText.setText(carWash);
         sporttext.setText(sport);
         weatherLayout.setVisibility(View.VISIBLE);
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        startService(intent);
     }
 }
